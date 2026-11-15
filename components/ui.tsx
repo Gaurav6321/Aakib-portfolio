@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { createContext, useContext, useRef, type ReactNode } from "react";
+import { createContext, useContext, useId, useRef, useState, type ReactNode } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -237,12 +237,67 @@ export function ParallaxImage({
   priority?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+
+  // Hover: a ragged blob trails the cursor and shows a black-and-white negative of
+  // the image inside it. The blob is a circle pushed through a noise filter, used
+  // as an SVG mask over a second, inverted copy of the same (already loaded) image.
+  const id = useId().replace(/:/g, "");
+  const [href, setHref] = useState<string>();
+  const cx = useSpring(0, { stiffness: 170, damping: 22 });
+  const cy = useSpring(0, { stiffness: 170, damping: 22 });
+  const radius = useSpring(0, { stiffness: 110, damping: 18 });
+  const r = useTransform(radius, (v) => Math.max(0, v));
+  const at = (e: React.PointerEvent) => {
+    const b = inner.current?.getBoundingClientRect();
+    return b ? { x: e.clientX - b.left, y: e.clientY - b.top, size: Math.min(b.width, b.height) } : null;
+  };
   return (
-    <div ref={ref} className="pimg">
-      <motion.div className="pimg_inner" style={{ y }}>
+    <div
+      ref={ref}
+      className="pimg has-blob"
+      onPointerEnter={(e) => {
+        const p = at(e);
+        if (!p || e.pointerType !== "mouse") return;
+        setHref(ref.current?.querySelector("img")?.currentSrc);
+        cx.jump(p.x);
+        cy.jump(p.y);
+        radius.set(p.size * 0.2);
+      }}
+      onPointerMove={(e) => {
+        const p = at(e);
+        if (!p || e.pointerType !== "mouse") return;
+        cx.set(p.x);
+        cy.set(p.y);
+      }}
+      onPointerLeave={() => radius.set(0)}
+    >
+      <motion.div ref={inner} className="pimg_inner" style={{ y }}>
         <Image src={src} alt={alt} fill sizes={sizes} priority={priority} quality={95} />
+        {href && (
+          <svg className="pimg_blob" aria-hidden>
+            <defs>
+              <filter id={`f${id}`} x="-60%" y="-60%" width="220%" height="220%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="3" seed="7" result="noise">
+                  <animate attributeName="baseFrequency" dur="8s" values="0.016;0.024;0.016" repeatCount="indefinite" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="90" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              <mask id={`m${id}`} maskUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%">
+                <motion.circle cx={cx} cy={cy} r={r} fill="#fff" filter={`url(#f${id})`} />
+              </mask>
+            </defs>
+            <image
+              href={href}
+              width="100%"
+              height="100%"
+              preserveAspectRatio="xMidYMid slice"
+              mask={`url(#m${id})`}
+            />
+          </svg>
+        )}
       </motion.div>
       <div className="img_overlay" />
     </div>

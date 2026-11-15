@@ -1,6 +1,6 @@
 # Aakib-portfolio
 
-Portfolio site for Akib Sayyad — multi-disciplinary artist & illustrator. Built with Next.js (App Router), Tailwind CSS v4, Framer Motion and Lenis smooth scroll.
+Portfolio site for Aakib Sayyad — multi-disciplinary artist & illustrator. Built with Next.js (App Router), Tailwind CSS v4, Framer Motion and Lenis smooth scroll.
 
 ## Deploy
 

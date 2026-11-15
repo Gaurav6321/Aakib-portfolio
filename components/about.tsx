@@ -42,9 +42,9 @@ export default function About() {
           animate={ready ? { opacity: 1, scale: 1, y: 0 } : {}}
           transition={{ duration: 1.6, ease: EASE, delay: 0.6 }}
         >
-          {/* plink = same scale-down / darken hover as the project images */}
+          {/* plink marks it as hoverable for the cursor; the image shows the inverted blob on hover */}
           <div className="plink" data-h>
-            <ParallaxImage src={site.aboutHeroImage} alt="Portrait of Akib Sayyad" sizes="93vw" priority />
+            <ParallaxImage src={site.aboutHeroImage} alt="Portrait of Aakib Sayyad" sizes="93vw" priority />
           </div>
         </motion.div>
         <h2 className="ab_hero_title">

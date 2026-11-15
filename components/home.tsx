@@ -87,8 +87,8 @@ export function HomeAbout() {
           viewport={{ once: true, margin: "0px 0px -15% 0px" }}
           transition={{ duration: 1.6, ease: EASE }}
         >
-          <Link href="/about" className="plink" aria-label="About Akib" data-h>
-            <ParallaxImage src={site.homeAboutImage} alt="Portrait of Akib Sayyad" sizes="(max-width: 768px) 90vw, 40vw" />
+          <Link href="/about" className="plink" aria-label="About Aakib" data-h>
+            <ParallaxImage src={site.homeAboutImage} alt="Portrait of Aakib Sayyad" sizes="(max-width: 768px) 90vw, 40vw" />
           </Link>
         </motion.div>
         <div className="h_about_btn">

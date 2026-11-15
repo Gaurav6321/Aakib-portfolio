@@ -134,7 +134,7 @@ export const fmtDate = (unix: number) => {
 export const featured = projects.slice(0, 3);
 
 export const site = {
-  name: "Akib Sayyad",
+  name: "Aakib Sayyad",
   role: "Multi-Disciplinary Artist & Illustrator",
   behance: "https://www.behance.net/aakibart",
   // Only Behance is a verified link. Add { label, href } entries (email, Instagram…) here.
@@ -146,16 +146,16 @@ export const site = {
     "that people remember.",
   ],
   homeAbout: [
-    "Hello, my name's Akib, senior",
+    "Hello, my name's Aakib, senior",
     "graphic designer in Pune, India, where",
     "I create campaigns, ads and artwork.",
   ],
-  // Akib's portrait, backdrop widened so the full word PORTFOLIO shows (public/akib.jpg).
+  // Aakib's portrait, backdrop widened so the full word PORTFOLIO shows (public/akib.jpg).
   homeAboutImage: "/akib.jpg",
   aboutHeroImage: "/akib.jpg",
   aboutQuote: ["Every visual should earn its place", "and say something worth seeing."],
   bio: [
-    "Hello, my name's Akib, I'm a senior graphic",
+    "Hello, my name's Aakib, I'm a senior graphic",
     "designer and illustrator based in Pune, India,",
     "creating social media creatives, ad campaigns",
     "and brand visuals at SRV Media.",

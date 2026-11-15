@@ -13,9 +13,9 @@ const display = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Akib Sayyad — Multi-Disciplinary Artist & Illustrator",
+  title: "Aakib Sayyad — Multi-Disciplinary Artist & Illustrator",
   description:
-    "Portfolio of Akib Sayyad, multi-disciplinary artist, illustrator and senior graphic designer based in Pune, India.",
+    "Portfolio of Aakib Sayyad, multi-disciplinary artist, illustrator and senior graphic designer based in Pune, India.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
