@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { EASE, Letters, Lines, ParallaxImage, SectionHeader, useReady } from "./ui";
+import { EASE, Letters, Lines, ParallaxImage, ScrollWords, SectionHeader, useReady } from "./ui";
 import { site } from "@/lib/data";
 
 function DotList({ items }: { items: string[] }) {
@@ -38,8 +38,8 @@ export default function About() {
       <section className="ab_hero">
         <motion.div
           className="ab_hero_img"
-          initial={{ opacity: 0, scale: 0.85, y: 60 }}
-          animate={ready ? { opacity: 1, scale: 1, y: 0 } : {}}
+          initial={{ clipPath: "inset(100% 0% 0% 0%)", y: 60 }}
+          animate={ready ? { clipPath: "inset(0% 0% 0% 0%)", y: 0 } : {}}
           transition={{ duration: 1.6, ease: EASE, delay: 0.6 }}
         >
           {/* plink marks it as hoverable for the cursor; the image shows the inverted blob on hover */}
@@ -59,9 +59,14 @@ export default function About() {
         <SectionHeader nbr="01/" total="/03" />
         <div className="ab_row">
           <h3 className="ab_label">About me</h3>
-          <p className="ab_bio">
-            <Lines lines={site.bio} />
-          </p>
+          <div className="ab_bio">
+            {site.bio
+              .join(" ")
+              .split("  ")
+              .map((para) => (
+                <ScrollWords key={para} text={para} />
+              ))}
+          </div>
         </div>
       </section>
 

@@ -72,6 +72,7 @@ export default function ProjectsSlider() {
                 aria-label={`${pr.title} on Behance`}
                 tabIndex={i === active ? 0 : -1}
                 data-h
+                data-cursor="View"
               >
                 <div className="pimg">
                   <div className="pimg_inner">

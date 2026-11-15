@@ -10,6 +10,7 @@ import {
   motion,
   MotionConfig,
   useMotionValue,
+  useScroll,
   useSpring,
   useTransform,
 } from "framer-motion";
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <MotionConfig reducedMotion="user">
         <ReadyCtx.Provider value={ready}>
           <div className="bg" aria-hidden />
+          <Progress />
           <ScrollReset />
           <Header />
           {children}
@@ -33,6 +35,12 @@ export function Providers({ children }: { children: ReactNode }) {
       </MotionConfig>
     </ReactLenis>
   );
+}
+
+/** Hairline along the top edge that fills as the page is scrolled. */
+function Progress() {
+  const { scrollYProgress } = useScroll();
+  return <motion.div className="progress" style={{ scaleX: scrollYProgress }} aria-hidden />;
 }
 
 function ScrollReset() {
@@ -153,28 +161,42 @@ function Cursor() {
   const x = useSpring(useMotionValue(-100), { stiffness: 500, damping: 40, mass: 0.6 });
   const y = useSpring(useMotionValue(-100), { stiffness: 500, damping: 40, mass: 0.6 });
   const [hover, setHover] = useState(false);
+  // elements with data-cursor="View" turn the cursor into a labelled disc
+  const [label, setLabel] = useState("");
+  const [labelOn, setLabelOn] = useState(false);
   useEffect(() => {
     const move = (e: PointerEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
-      setHover(!!(e.target as Element).closest?.("[data-h]"));
+      const t = e.target as Element;
+      setHover(!!t.closest?.("[data-h]"));
+      const text = t.closest?.<HTMLElement>("[data-cursor]")?.dataset.cursor;
+      if (text) setLabel(text);
+      setLabelOn(!!text);
     };
     window.addEventListener("pointermove", move);
     return () => window.removeEventListener("pointermove", move);
   }, [x, y]);
   return (
-    <motion.div className="cursor" style={{ x, y }} aria-hidden>
-      <motion.div
-        className="cursor_ticks"
-        animate={{ rotate: hover ? 45 : 0, scale: hover ? 2.2 : 1 }}
-        transition={{ duration: 0.5, ease: EASE }}
-      >
-        <i />
-        <i />
-        <i />
-        <i />
+    <>
+      <motion.div className="cursor" style={{ x, y }} aria-hidden>
+        <motion.div
+          className="cursor_ticks"
+          animate={{ rotate: hover ? 45 : 0, scale: labelOn ? 0 : hover ? 2.2 : 1 }}
+          transition={{ duration: 0.5, ease: EASE }}
+        >
+          <i />
+          <i />
+          <i />
+          <i />
+        </motion.div>
       </motion.div>
-    </motion.div>
+      <motion.div className="cursor cursor_label" style={{ x, y }} aria-hidden>
+        <motion.span animate={{ scale: labelOn ? 1 : 0 }} transition={{ duration: 0.45, ease: EASE }}>
+          {label}
+        </motion.span>
+      </motion.div>
+    </>
   );
 }
 

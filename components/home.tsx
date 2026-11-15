@@ -1,12 +1,57 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { ArrowDown } from "lucide-react";
-import { CircleButton, EASE, Letters, Lines, Marquee, ParallaxImage, SectionHeader, useReady } from "./ui";
-import { featured, fmtDate, site, type Project } from "@/lib/data";
+import { CircleButton, EASE, Letters, Lines, Marquee, ParallaxImage, ScrollWords, SectionHeader, useReady } from "./ui";
+import { featured, fmtDate, projects, site, type Project } from "@/lib/data";
+
+/** Moving the mouse across the hero leaves a trail of project covers that pop in and fade. */
+function HeroTrail() {
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const items = [...el.children] as HTMLElement[];
+    let last = { x: 0, y: 0 };
+    let n = 0;
+    const move = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX - last.x;
+      if (e.clientY < r.top || e.clientY > r.bottom || Math.hypot(dx, e.clientY - last.y) < 120) return;
+      last = { x: e.clientX, y: e.clientY };
+      const it = items[n % items.length];
+      it.style.left = `${e.clientX - r.left}px`;
+      it.style.top = `${e.clientY - r.top}px`;
+      it.style.zIndex = String(++n);
+      const c = "translate(-50%, -50%)";
+      it.animate(
+        [
+          { opacity: 1, transform: `${c} scale(0.35) rotate(${dx > 0 ? -8 : 8}deg)` },
+          { opacity: 1, transform: `${c} scale(1) rotate(0deg)`, offset: 0.25 },
+          { opacity: 1, transform: `${c} scale(1) rotate(0deg)`, offset: 0.65 },
+          { opacity: 0, transform: `translate(-50%, -30%) scale(0.8) rotate(0deg)` },
+        ],
+        { duration: 1200, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+      );
+    };
+    window.addEventListener("pointermove", move);
+    return () => window.removeEventListener("pointermove", move);
+  }, []);
+  return (
+    <div ref={box} className="hero_trail" aria-hidden>
+      {projects.slice(0, 8).map((p) => (
+        <div key={p.id}>
+          <Image src={p.image} alt="" fill sizes="(max-width: 768px) 1px, 14vw" quality={95} />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function Hero() {
   const ready = useReady();
@@ -35,6 +80,7 @@ export function Hero() {
 
   return (
     <section className="hero">
+      <HeroTrail />
       <motion.p
         className="hero_scroll"
         initial={{ opacity: 0 }}
@@ -82,8 +128,8 @@ export function HomeAbout() {
         </p>
         <motion.div
           className="h_about_img"
-          initial={{ opacity: 0, scale: 0.8, y: 80 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          initial={{ clipPath: "inset(100% 0% 0% 0%)", y: 80 }}
+          whileInView={{ clipPath: "inset(0% 0% 0% 0%)", y: 0 }}
           viewport={{ once: true, margin: "0px 0px -15% 0px" }}
           transition={{ duration: 1.6, ease: EASE }}
         >
@@ -121,8 +167,8 @@ function FeaturedCard({
   return (
     <motion.div ref={ref} className="feat_card" style={{ y }}>
       <motion.div
-        initial={{ opacity: 0, y: 120 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ clipPath: "inset(100% 0% 0% 0%)", y: 120 }}
+        whileInView={{ clipPath: "inset(0% 0% 0% 0%)", y: 0 }}
         viewport={{ once: true, margin: "0px 0px -10% 0px" }}
         transition={{ duration: 1.4, ease: EASE, delay: i * 0.12 }}
       >
@@ -168,15 +214,10 @@ export function Featured() {
           <span className="ind">Projects</span>
         </CircleButton>
       </div>
-      <p className="feat_intro">
-        <Lines
-          lines={[
-            "Here are some select projects that showcase",
-            "my passion for bringing memorable campaigns,",
-            "artworks, and brands to life.",
-          ]}
-        />
-      </p>
+      <ScrollWords
+        className="feat_intro"
+        text="Here are some select projects that showcase my passion for bringing memorable campaigns, artworks, and brands to life."
+      />
       <div className="feat_row">
         {featured.map((p, i) => (
           <FeaturedCard key={p.id} p={p} i={i} onHover={setHovered} />
@@ -250,6 +291,7 @@ export function Capabilities() {
             >
               <motion.div
                 className="caps_drag"
+                data-cursor="Drag"
                 drag
                 dragConstraints={area}
                 dragElastic={0.25}

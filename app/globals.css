@@ -794,6 +794,17 @@ button:focus-visible {
   display: flex;
   gap: 12rem;
 }
+.footer_mark {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0 1rem;
+  overflow: hidden;
+  font-size: 17rem;
+  line-height: 0.82;
+  letter-spacing: -0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
 
 /* ---------- projects ---------- */
 .pj {
@@ -1480,6 +1491,10 @@ button:focus-visible {
     width: auto;
     font-size: 1.2rem;
   }
+  .footer_mark {
+    font-size: 4.5rem;
+    letter-spacing: -0.2rem;
+  }
   .ab_bio {
     font-size: 2.1rem;
     line-height: 2.5rem;
@@ -1530,4 +1545,71 @@ button:focus-visible {
 }
 .plink:hover .pimg.has-blob .img_overlay {
   opacity: 0;
+}
+
+/* ---------- award-site extras ---------- */
+/* scroll progress hairline */
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: 2px;
+  background: #fff;
+  transform-origin: left;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+/* hero cursor trail of project covers (mouse only) */
+.hero_trail {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero_trail > div {
+  position: absolute;
+  width: 17rem;
+  height: 22rem;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  opacity: 0;
+}
+.hero_trail img {
+  object-fit: cover;
+}
+.hero_scroll,
+.hero_center {
+  z-index: 1;
+}
+/* labelled cursor disc ("View", "Drag") */
+.cursor_label {
+  mix-blend-mode: normal;
+  z-index: 199;
+}
+.cursor_label span {
+  position: absolute;
+  left: -4.5rem;
+  top: -4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 9rem;
+  height: 9rem;
+  border-radius: 50%;
+  background: #fff;
+  color: #000;
+  font-size: 1.3rem;
+  letter-spacing: -0.05rem;
+}
+/* scroll-lit paragraphs */
+.ab_bio {
+  max-width: 88rem;
+}
+.ab_bio p + p {
+  margin-top: 4.2rem;
+}
+@media (max-width: 768px) {
+  .ab_bio p + p {
+    margin-top: 2.5rem;
+  }
 }

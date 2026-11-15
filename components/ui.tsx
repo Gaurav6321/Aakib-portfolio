@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { createContext, useContext, useId, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -12,6 +12,7 @@ import {
   useTransform,
   useVelocity,
   wrap,
+  type MotionValue,
   type Variants,
 } from "framer-motion";
 import { site } from "@/lib/data";
@@ -95,6 +96,40 @@ export function Lines({
         </span>
       ))}
     </motion.span>
+  );
+}
+
+/** Paragraph whose words light up one by one as it scrolls through the viewport. */
+export function ScrollWords({ text, className = "" }: { text: string; className?: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 88%", "end 50%"] });
+  const words = text.split(" ");
+  return (
+    <p ref={ref} className={className}>
+      {words.map((w, i) => (
+        <ScrollWord key={i} progress={scrollYProgress} from={i / words.length} to={(i + 1) / words.length}>
+          {w}
+        </ScrollWord>
+      ))}
+    </p>
+  );
+}
+function ScrollWord({
+  children,
+  progress,
+  from,
+  to,
+}: {
+  children: string;
+  progress: MotionValue<number>;
+  from: number;
+  to: number;
+}) {
+  const opacity = useTransform(progress, [from, to], [0.16, 1]);
+  return (
+    <>
+      <motion.span style={{ opacity }}>{children}</motion.span>{" "}
+    </>
   );
 }
 
@@ -386,23 +421,41 @@ export function Contact() {
   );
 }
 
+/** Live local time where Aakib works. */
+function Clock() {
+  const [time, setTime] = useState("");
+  useEffect(() => {
+    const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" });
+    const id = setInterval(() => setTime(fmt.format(new Date())), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return <p className="footer_clock">Pune, India{time && ` \u2014 ${time} IST`}</p>;
+}
+
 export function Footer() {
   return (
-    <motion.footer
-      className="footer"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 1, ease: EASE }}
-    >
-      <p>Feel free to connect with me on social</p>
-      <nav>
-        {site.socials.map((s) => (
-          <Pill key={s.href} href={s.href} external>
-            {s.label}
-          </Pill>
-        ))}
-      </nav>
-    </motion.footer>
+    <footer>
+      <motion.div
+        className="footer"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1, ease: EASE }}
+      >
+        <p>Feel free to connect with me on social</p>
+        <Clock />
+        <nav>
+          {site.socials.map((s) => (
+            <Pill key={s.href} href={s.href} external>
+              {s.label}
+            </Pill>
+          ))}
+        </nav>
+      </motion.div>
+      {/* oversized sign-off wordmark */}
+      <p className="footer_mark" aria-hidden>
+        <Letters text={site.name} stagger={0.045} />
+      </p>
+    </footer>
   );
 }
